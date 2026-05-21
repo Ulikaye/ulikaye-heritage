@@ -1,0 +1,353 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Ulikaye Family Heritage</title>
+
+<style>
+/* --- ORIGINAL STYLES (unchanged) --- */
+body {
+    margin: 0;
+    background-color: #0b0f19;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 500;
+    background: rgba(10, 15, 25, 0.6);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-sizing: border-box;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo-text {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+.nav-links a {
+    text-decoration: none;
+    color: #ddd;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.nav-links a:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+#hex-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+.hex-wrapper {
+    position: absolute;
+    opacity: 0;
+    transform: translateY(-200vh) scale(0.7) rotate(-10deg);
+    animation: dropIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    filter: blur(6px);
+}
+.hex {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: #222;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease, filter 0.3s;
+    cursor: pointer;
+}
+.hex::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    transition: background 0.3s;
+    z-index: 1;
+}
+.hex-wrapper:hover .hex {
+    transform: scale(1.15);
+}
+.hex-wrapper:hover .hex::before {
+    background: rgba(0,0,0,0.1);
+}
+.hex-content {
+    position: relative;
+    z-index: 2;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 5px black;
+}
+@keyframes dropIn {
+    0% { opacity: 0; transform: translateY(-200vh) scale(0.7) rotate(-10deg); filter: blur(8px); }
+    60% { opacity: 1; transform: translateY(20px) scale(1.05) rotate(2deg); filter: blur(2px); }
+    80% { transform: translateY(-5px) scale(0.98) rotate(-1deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); filter: blur(0); }
+}
+.overlay-section {
+    position: relative;
+    z-index: 800;
+    margin-top: -120px;
+    padding: 28px 14px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: center;
+    width: min(100%, 760px);
+    margin-left: auto;
+    margin-right: auto;
+}
+.glass-card {
+    width: 100%;
+    max-width: none;
+    padding: 28px 24px;
+    border-radius: 24px;
+    background: rgba(12, 16, 28, 0.66);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.48);
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 1s ease forwards;
+    text-align: left;
+}
+.glass-card:nth-child(2) { animation-delay: 0.3s; }
+.glass-card:nth-child(3) { animation-delay: 0.6s; }
+.glass-card h2 { margin: 0 0 10px 0; font-size: 1.4rem; }
+.glass-card p { color: #d0d0d0; line-height: 1.6; margin: 0; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+footer {
+    position: relative;
+    z-index: 200;
+    margin-top: 60px;
+    padding: 30px 20px;
+    text-align: center;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    color: #aaa;
+    font-size: 0.9rem;
+}
+footer span { color: #fff; font-weight: bold; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 22px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 510;
+}
+.hamburger span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+}
+@media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .nav-links {
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(10, 15, 25, 0.96);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 18px 24px;
+        border: 1px solid rgba(255,255,255,0.15);
+        width: 180px;
+        display: none;
+        z-index: 600;
+    }
+    .nav-links.show { display: flex; }
+    .nav-links a { padding: 10px 0; text-align: center; }
+    header { padding: 0 16px; }
+    .overlay-section { width: 100%; padding: 20px 12px 30px; gap: 14px; }
+    .glass-card { width: 90%; max-width: 340px; margin: 0 auto; padding: 20px 18px; }
+    .glass-card h2 { font-size: 1.25rem; }
+    .glass-card p { font-size: 0.85rem; line-height: 1.5; }
+}
+@media (max-width: 480px) {
+    .glass-card { width: 92%; padding: 16px 14px; }
+    .glass-card h2 { font-size: 1.15rem; }
+    .glass-card p { font-size: 0.8rem; }
+    .overlay-section { margin-top: -70px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <img src="{% static 'heritage/images/logo.PNG' %}" alt="Logo" style="height: 96px; width: auto;">
+        <div class="logo-text">Ulikaye Heritage</div>
+    </div>
+    <div class="header-right">
+        <div class="nav-links" id="navLinks">
+            <a href="{% url 'admin_panel' %}" id="adminLink">Admin</a>
+            <a href="{% url 'member_profile' %}" id="userLink">My Profile</a>
+        </div>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+<div id="hex-container"></div>
+<div class="overlay-section">
+    <div class="glass-card">
+        <h2>Our Origins</h2>
+        <p>The Ulikaye family traces its roots through generations of resilience, migration, and tradition. This platform preserves the story of where we began.</p>
+    </div>
+    <div class="glass-card">
+        <h2>Living Heritage</h2>
+        <p>From elders to the youngest generation, every member contributes to a living history shaped by culture, memory, and shared identity.</p>
+    </div>
+    <div class="glass-card">
+        <h2>Digital Legacy</h2>
+        <p>This system ensures that our stories, voices, and connections are preserved and accessible only to those who belong to this lineage.</p>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 <span>Ulikaye Family Heritage</span></p>
+    <p>Preserving identity. Protecting legacy.</p>
+</footer>
+
+<script>
+const container = document.getElementById('hex-container');
+
+const familyData = [
+    { name: "Family Tree", img: "https://picsum.photos/seed/tree/300", link: "/family-tree/" },
+    { name: "Search", img: "https://picsum.photos/seed/search/300", link: "/search/" },
+    { name: "Gallery", img: "https://picsum.photos/seed/gallery/300", link: "/gallery/" },
+    { name: "Timeline", img: "https://picsum.photos/seed/timeline/300", link: "/timeline/" },
+    { name: "Traditions", img: "https://picsum.photos/seed/tradition/300", link: "/traditions/" },
+    { name: "Clan Stories", img: "https://picsum.photos/seed/story/300", link: "/clan-stories/" },
+    { name: "Migration", img: "https://picsum.photos/seed/map/300", link: "/migration/" },
+    { name: "Elders Voices", img: "https://picsum.photos/seed/audio/300", link: "/elders-voices/" },
+    { name: "Map", img: "https://picsum.photos/seed/map/300", link: "/map/" },
+    { name: "Members", img: "https://picsum.photos/seed/members/300", link: "/profile/" },
+];
+
+function getResponsiveHexWidth() {
+    const w = window.innerWidth;
+    if (w < 480) return 110;
+    if (w < 640) return 130;
+    if (w < 900) return 160;
+    return 190;
+}
+
+function buildWall() {
+    if (!container) return;
+    container.innerHTML = '';
+    const hexWidth = getResponsiveHexWidth();
+    const hexRadius = hexWidth / Math.sqrt(3);
+    const hexHeight = hexRadius * 2;
+    const gap = 0;
+    const horizontalSpacing = hexWidth + gap;
+    const verticalSpacing = (hexHeight * 0.75) + gap;
+    const cols = Math.ceil(window.innerWidth / horizontalSpacing) + 2;
+    const rows = Math.ceil(window.innerHeight / verticalSpacing) + 2;
+    let dataIndex = 0;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'hex-wrapper';
+            wrapper.style.width = hexWidth + 'px';
+            wrapper.style.height = hexHeight + 'px';
+            const isOdd = row % 2 !== 0;
+            const xOffset = isOdd ? horizontalSpacing / 2 : 0;
+            wrapper.style.left = (col * horizontalSpacing + xOffset - hexWidth/2) + 'px';
+            wrapper.style.top = (row * verticalSpacing) + 'px';
+            wrapper.style.animationDelay = (row * 0.08 + col * 0.02) + 's';
+            const hex = document.createElement('div');
+            hex.className = 'hex';
+            const item = familyData[dataIndex % familyData.length];
+            hex.style.backgroundImage = `url(${item.img})`;
+            hex.onclick = (function(category) {
+                return function() { 
+                    if (category.link && category.link !== "#") {
+                        window.location.href = category.link;
+                    } else {
+                        alert("Opening: " + category.name);
+                    }
+                };
+            })(item);
+            const content = document.createElement('div');
+            content.className = 'hex-content';
+            content.innerText = item.name;
+            hex.appendChild(content);
+            wrapper.appendChild(hex);
+            container.appendChild(wrapper);
+            dataIndex++;
+        }
+    }
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        buildWall();
+        if (window.innerWidth > 768) document.getElementById('navLinks')?.classList.remove('show');
+    }, 150);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const navMenu = document.getElementById('navLinks');
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            navMenu.classList.toggle('show'); 
+        });
+    }
+    document.addEventListener('click', (event) => {
+        if (window.innerWidth <= 768 && navMenu?.classList.contains('show') && !event.target.closest('header')) {
+            navMenu.classList.remove('show');
+        }
+    });
+    window.addEventListener('resize', () => { 
+        if (window.innerWidth > 768 && navMenu) navMenu.classList.remove('show'); 
+    });
+    buildWall();
+});
+</script>
+</body>
+</html>

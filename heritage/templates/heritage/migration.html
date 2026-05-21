@@ -1,0 +1,199 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Migration Stories | Ulikaye Heritage</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b0f19;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      padding-bottom: 60px;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 500;
+      background: rgba(10, 15, 25, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo-container { display: flex; align-items: center; gap: 10px; }
+    .logo-text { font-weight: bold; letter-spacing: 1px; }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { text-decoration: none; color: #ddd; padding: 8px 14px; border-radius: 10px; transition: 0.3s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .container { max-width: 1200px; margin: 100px auto 40px; padding: 0 24px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .sub { color: #aaa; margin-bottom: 28px; }
+    .admin-panel {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 32px;
+      display: none;
+    }
+    .admin-panel.show { display: block; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+    .form-group { flex: 1; min-width: 180px; }
+    label { display: block; margin-bottom: 6px; color: #ccc; font-size: 0.8rem; }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #1e2a3a;
+      border: none;
+      border-radius: 16px;
+      color: white;
+    }
+    button {
+      background: #1f6feb;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary { background: #3a4a5a; }
+    .migration-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .migration-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: 0.2s;
+    }
+    .migration-card:hover { border-color: #1f6feb; transform: translateY(-2px); }
+    .migration-year { color: #1f6feb; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .migration-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; }
+    .migration-route { color: #aaa; font-size: 0.85rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .migration-story { color: #ccc; line-height: 1.5; margin-bottom: 12px; }
+    .migration-meta { font-size: 0.7rem; color: #888; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .delete-mig { background: #d33; padding: 4px 12px; font-size: 0.7rem; margin-top: 12px; border: none; border-radius: 20px; color: white; cursor: pointer; }
+    .icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: middle; }
+    @media (max-width: 768px) { .migration-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header>
+       <img src="{% static 'heritage/images/logo.PNG' %}" alt="Logo" style="height: 96px; width: auto;">
+       </canvas><div class="logo-text">Migration</div></div>
+  <div class="nav-links"><a href="{% url 'home' %}">Dashboard</a><form method="post" action="{% url 'logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: none; border: none; color: #ddd; padding: 8px 14px; cursor: pointer;">Logout</button>
+</form></div>
+</header>
+
+<div class="container">
+  <h1>
+    <svg class="icon" viewBox="0 0 24 24" width="28" height="28"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+    Migration Stories
+  </h1>
+  <div class="sub">The journeys, routes, and resettlements of the Ulikaye family</div>
+
+  {% if is_admin %}
+  <div id="adminPanel" class="admin-panel">
+    <h3 style="display: flex; align-items: center; gap: 8px;">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M20 8h-2.81c-.45-.78-1.07-1.45-1.82-1.96L17 4.41 15.59 3l-2.17 2.17C12.96 5.06 12.49 5 12 5s-.96.06-1.41.17L8.41 3 7 4.41l1.62 1.63c-.75.51-1.37 1.18-1.82 1.96H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81c1.04 1.79 2.97 3 5.19 3s4.15-1.21 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8z"/></svg>
+      Add Migration Story
+    </h3>
+    <form method="post" action="{% url 'add_migration_story' %}">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+        <div class="form-group"><label>Year</label><input type="number" name="year" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>From (Origin)</label><input type="text" name="from_place"></div>
+        <div class="form-group"><label>To (Destination)</label><input type="text" name="to_place"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Story / Description</label><textarea name="story" rows="3"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Related Members</label>
+          <select name="related_members" multiple size="4">
+            {% for member in members %}
+              <option value="{{ member.id }}">{{ member.full_name }}</option>
+            {% endfor %}
+          </select>
+          <small style="color:#aaa;">Hold Ctrl (Cmd) to select multiple</small>
+        </div>
+      </div>
+      <button type="submit">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Add Migration
+      </button>
+      <button type="button" id="toggleAdminBtn" class="btn-secondary">Hide Panel</button>
+    </form>
+  </div>
+  <button id="showAdminBtn" class="btn-secondary" style="margin-bottom:20px;">Show Add Form</button>
+  {% endif %}
+
+  <div class="migration-grid">
+    {% for story in stories %}
+    <div class="migration-card">
+      <div class="migration-year">
+        <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+        {{ story.year }}
+      </div>
+      <div class="migration-title">{{ story.title }}</div>
+      <div class="migration-route">
+        <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        {{ story.from_place|default:"?" }} → {{ story.to_place|default:"?" }}
+      </div>
+      <div class="migration-story">{{ story.story|linebreaksbr }}</div>
+      <div class="migration-meta">
+        {% if story.related_members.all %}
+          <span style="display: inline-flex; align-items: center; gap: 4px;">
+            <svg class="icon" viewBox="0 0 24 24" width="12" height="12"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Involved: 
+            {% for m in story.related_members.all %}
+              <span>{{ m.full_name }}</span>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </span>
+        {% endif %}
+      </div>
+      {% if is_admin %}
+      <form method="post" action="{% url 'delete_migration_story' story.id %}" onsubmit="return confirm('Delete this migration story?');">
+        {% csrf_token %}
+        <button type="submit" class="delete-mig">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="sub" style="text-align:center;">No migration stories yet. Admins can add family journeys.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  const adminPanel = document.getElementById('adminPanel');
+  const showBtn = document.getElementById('showAdminBtn');
+  const toggleBtn = document.getElementById('toggleAdminBtn');
+  if(showBtn) showBtn.addEventListener('click', () => { adminPanel.classList.add('show'); showBtn.style.display='none'; });
+  if(toggleBtn) toggleBtn.addEventListener('click', () => { adminPanel.classList.remove('show'); if(showBtn) showBtn.style.display='inline-block'; });
+
+  const canvas = document.getElementById("logoCanvas");
+  const ctx = canvas.getContext("2d");
+</script>
+</body>
+</html>

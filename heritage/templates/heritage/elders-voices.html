@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Elders Voices | Ulikaye Heritage</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b0f19;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      padding-bottom: 60px;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 500;
+      background: rgba(10, 15, 25, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo-container { display: flex; align-items: center; gap: 10px; }
+    .logo-text { font-weight: bold; letter-spacing: 1px; }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { text-decoration: none; color: #ddd; padding: 8px 14px; border-radius: 10px; transition: 0.3s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .container { max-width: 1000px; margin: 100px auto 40px; padding: 0 24px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .sub { color: #aaa; margin-bottom: 28px; }
+    .admin-panel {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 32px;
+      display: none;
+    }
+    .admin-panel.show { display: block; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+    .form-group { flex: 1; min-width: 180px; }
+    label { display: block; margin-bottom: 6px; color: #ccc; font-size: 0.8rem; }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #1e2a3a;
+      border: none;
+      border-radius: 16px;
+      color: white;
+    }
+    button {
+      background: #1f6feb;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary { background: #3a4a5a; }
+    .voices-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .voice-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: 0.2s;
+    }
+    .voice-card:hover { border-color: #1f6feb; }
+    .voice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .voice-name { font-size: 1.3rem; font-weight: bold; }
+    .voice-year { color: #aaa; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; }
+    .voice-topic { color: #1f6feb; margin-bottom: 12px; font-style: italic; display: inline-flex; align-items: center; gap: 6px; }
+    .voice-transcript {
+      color: #ccc;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    audio { width: 100%; margin: 12px 0; border-radius: 40px; }
+    .voice-meta { font-size: 0.7rem; color: #888; display: flex; gap: 16px; margin-top: 8px; }
+    .delete-voice { background: #d33; padding: 6px 14px; font-size: 0.7rem; margin-top: 12px; }
+    .icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: middle; }
+    @media (max-width: 768px) { .voice-header { flex-direction: column; gap: 8px; } }
+  </style>
+</head>
+<body>
+<header>
+  <img src="{% static 'heritage/images/logo.PNG' %}" alt="Logo" style="height: 96px; width: auto;"><div class="logo-text">Elders Voices</div></div>
+  <div class="nav-links">
+    <a href="{% url 'home' %}">Dashboard</a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: none; border: none; color: #ddd; padding: 8px 14px; cursor: pointer;">Logout</button>
+</form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </div>
+</header>
+
+<div class="container">
+  <h1>
+    <svg class="icon" viewBox="0 0 24 24" width="28" height="28"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>
+    Elders Voices
+  </h1>
+  <div class="sub">Preserving oral histories, wisdom, and stories from our elders</div>
+
+  {% if is_admin %}
+  <div id="adminPanel" class="admin-panel">
+    <h3 style="display: flex; align-items: center; gap: 8px;">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Add Oral History Recording
+    </h3>
+    <form method="post" action="{% url 'add_elder_voice' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group"><label>Elder Name</label><input type="text" name="elder_name" required></div>
+        <div class="form-group"><label>Year Recorded</label><input type="number" name="year_recorded"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Topic / Theme</label><input type="text" name="topic"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Transcript / Summary</label><textarea name="transcript" rows="3"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Audio File</label><input type="file" name="audio_file" accept="audio/*"></div>
+      </div>
+      <button type="submit">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Save Recording
+      </button>
+      <button type="button" id="toggleAdminBtn" class="btn-secondary">Hide Panel</button>
+    </form>
+  </div>
+  <button id="showAdminBtn" class="btn-secondary" style="margin-bottom: 20px;">Show Add Form</button>
+  {% endif %}
+
+  <div id="voicesGrid" class="voices-grid">
+    {% for voice in voices %}
+    <div class="voice-card">
+      <div class="voice-header">
+        <span class="voice-name">{{ voice.elder_name }}</span>
+        <span class="voice-year">
+          <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          {{ voice.year_recorded|default:"?" }}
+        </span>
+      </div>
+      <div class="voice-topic">
+        <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        {{ voice.topic|default:"Wisdom share" }}
+      </div>
+      <div class="voice-transcript">{{ voice.transcript|linebreaksbr|default:"No transcript available." }}</div>
+      {% if voice.audio_file %}
+        <audio controls src="{{ voice.audio_file.url }}"></audio>
+      {% else %}
+        <em>Audio file not available</em>
+      {% endif %}
+      <div class="voice-meta">
+        <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <svg class="icon" viewBox="0 0 24 24" width="12" height="12"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Recorded by: {{ voice.recorded_by.get_full_name|default:voice.recorded_by.username|default:"Anonymous" }}
+        </span>
+      </div>
+      {% if is_admin %}
+      <form method="post" action="{% url 'delete_elder_voice' voice.id %}" onsubmit="return confirm('Delete this recording?');">
+        {% csrf_token %}
+        <button type="submit" class="delete-voice">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="sub" style="text-align:center;">No oral histories yet. Admins can add recordings.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  // Admin panel toggle
+  const adminPanel = document.getElementById('adminPanel');
+  const showBtn = document.getElementById('showAdminBtn');
+  const toggleBtn = document.getElementById('toggleAdminBtn');
+  if (showBtn) {
+    showBtn.addEventListener('click', () => { adminPanel.classList.add('show'); showBtn.style.display = 'none'; });
+  }
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => { adminPanel.classList.remove('show'); if(showBtn) showBtn.style.display = 'inline-block'; });
+  }
+
+  // Logo canvas
+  const canvas = document.getElementById("logoCanvas");
+  const ctx = canvas.getContext("2d");
+</script>
+</body>
+</html>

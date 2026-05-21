@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Register | Ulikaye Heritage</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #0b0f19;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .glass-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 32px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .sub {
+      color: #aaa;
+      margin-bottom: 28px;
+      font-size: 0.9rem;
+    }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      margin: 10px 0;
+      background: #1e2a3a;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    input:focus {
+      background: #2a3a4a;
+      box-shadow: 0 0 0 2px #1f6feb;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #1f6feb;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #0f5bd6;
+      transform: scale(0.98);
+    }
+    .links {
+      margin-top: 24px;
+    }
+    .links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+    .links a:hover {
+      color: #1f6feb;
+    }
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="glass-card">
+  <h2>✉️ Join the Legacy</h2>
+  <div class="sub">Registration requires a valid family invitation code</div>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="invite_code" placeholder="Invitation Code" autocomplete="off" required>
+    <input type="text" name="full_name" placeholder="Full Name" autocomplete="name" required>
+    <input type="email" name="email" placeholder="Email Address" autocomplete="email" required>
+    <input type="password" name="password" placeholder="Password (min 6 characters)" autocomplete="new-password" required>
+    <input type="password" name="password_confirm" placeholder="Confirm Password" required>
+    {% if error %}
+      <div class="error-msg">{{ error }}</div>
+    {% endif %}
+    <button type="submit">Create Account</button>
+  </form>
+
+  <div class="links">
+    <a href="{% url 'login' %}">← Already have an account? Sign in</a>
+  </div>
+</div>
+</body>
+</html>

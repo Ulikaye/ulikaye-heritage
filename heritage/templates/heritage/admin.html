@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Panel | Ulikaye Heritage</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #0b0f19;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      padding-bottom: 60px;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 500;
+      background: rgba(10, 15, 25, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      box-sizing: border-box;
+    }
+    .logo-container { display:flex; align-items:center; gap:10px; }
+    .logo-text { font-weight:bold; letter-spacing:1px; }
+    .nav-links { display:flex; gap:20px; }
+    .nav-links a { text-decoration:none; color:#ddd; padding:8px 14px; border-radius:10px; transition:0.3s; }
+    .nav-links a:hover { background:rgba(255,255,255,0.1); color:#fff; }
+    .container { max-width:1400px; margin:100px auto 40px; padding:0 24px; }
+    h1 { font-size:2rem; margin-bottom:8px; }
+    .sub { color:#aaa; margin-bottom:32px; }
+    /* tabs */
+    .tabs { display:flex; gap:12px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:28px; flex-wrap:wrap; }
+    .tab-btn { background:transparent; border:none; color:#aaa; padding:12px 24px; font-size:1rem; cursor:pointer; transition:0.2s; border-radius:30px 30px 0 0; display:inline-flex; align-items:center; gap:8px; }
+    .tab-btn.active { color:#fff; background:rgba(31,111,235,0.2); border-bottom:2px solid #1f6feb; }
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; }
+    /* cards & forms */
+    .card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 28px;
+    }
+    .card h3 { margin-bottom: 20px; font-size:1.4rem; display:flex; align-items:center; gap:10px; }
+    .form-group { margin-bottom: 16px; }
+    label { display:block; margin-bottom:6px; color:#ccc; font-size:0.9rem; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: #1e2a3a;
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 2px #1f6feb; }
+    button {
+      background: #1f6feb;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button:hover { background: #0f5bd6; transform:scale(0.98); }
+    .btn-secondary { background: #3a4a5a; }
+    .btn-danger { background: #d33; }
+    .btn-danger:hover { background: #b22; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    th { color:#aaa; font-weight:normal; }
+    .actions button { margin:0 4px; padding:6px 12px; font-size:0.8rem; }
+    .invite-code { font-family: monospace; background:#1e2a3a; padding:4px 8px; border-radius:12px; }
+    @media (max-width:768px) { .container { padding:0 16px; } th,td { font-size:0.8rem; } .tab-btn { padding:8px 16px; } }
+    .icon { width: 1.2em; height: 1.2em; vertical-align: middle; fill: currentColor; stroke: none; }
+    .icon-lg { width: 1.4em; height: 1.4em; }
+  </style>
+</head>
+<body>
+<header>
+  <img src="{% static 'heritage/images/logo.PNG' %}" alt="Logo" style="height: 96px; width: auto;"><div class="logo-text">Admin Panel</div></div>
+  <div class="nav-links"><a href="{% url 'home' %}">Dashboard</a><form method="post" action="{% url 'logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: none; border: none; color: #ddd; padding: 8px 14px; cursor: pointer;">Logout</button>
+</form>
+</header>
+
+<div class="container">
+  <h1>⚙️ Administration</h1>
+  <div class="sub">Manage family members, invitation codes, and system logs</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="members">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Family Members
+    </button>
+    <button class="tab-btn" data-tab="invites">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      Invitation Codes
+    </button>
+    <button class="tab-btn" data-tab="logs">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      Audit Logs
+    </button>
+  </div>
+
+  <!-- Members Tab -->
+  <div id="membersTab" class="tab-pane active">
+    <div class="card">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Add New Family Member
+      </h3>
+      <form method="post" action="{% url 'add_member' %}">
+        {% csrf_token %}
+        <div class="form-group"><label>Full Name</label><input type="text" name="full_name" required></div>
+        <div class="form-group"><label>Birth Date (YYYY-MM-DD)</label><input type="date" name="birth_date"></div>
+        <div class="form-group"><label>Death Date (optional)</label><input type="date" name="death_date"></div>
+        <div class="form-group"><label>Biography</label><textarea name="bio" rows="3"></textarea></div>
+        <div class="form-group"><label>Photo URL (optional)</label><input type="url" name="photo_url"></div>
+        <button type="submit">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Create Member
+        </button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm2-4h12v2H6V2zm16 4H2v16h20V6zM4 8h16v10H4V8z"/></svg>
+        Existing Members
+      </h3>
+      <table>
+        <thead><tr><th>Name</th><th>Birth</th><th>Bio</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for member in members %}
+          <tr>
+            <td>{{ member.full_name }}</td>
+            <td>{{ member.birth_date|default:"—" }}</td>
+            <td>{{ member.bio|truncatechars:40 }}</td>
+            <td class="actions">
+              <a href="{% url 'edit_member' member.id %}"><button type="button" class="btn-secondary">Edit</button></a>
+              <form method="post" action="{% url 'delete_member' member.id %}" style="display:inline;" onsubmit="return confirm('Delete {{ member.full_name }}?');">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">No members yet. Add one above.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Invites Tab -->
+  <div id="invitesTab" class="tab-pane">
+    <div class="card">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        Generate Invitation Code
+      </h3>
+      <form method="post" action="{% url 'generate_invite' %}">
+        {% csrf_token %}
+        <div class="form-group"><label>Custom Code (optional, leave blank for random)</label><input type="text" name="custom_code" placeholder="e.g., FAMILY2026"></div>
+        <button type="submit">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          Generate Invite Code
+        </button>
+      </form>
+      {% if new_invite_code %}
+        <div id="newInviteCode" style="margin-top:16px; font-family:monospace; background:#1e2a3a; padding:10px; border-radius:16px;">✅ New code: {{ new_invite_code }}</div>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        Existing Invites
+      </h3>
+      <table>
+        <thead><tr><th>Code</th><th>Used</th><th>Used By</th><th>Created</th></tr></thead>
+        <tbody>
+          {% for inv in invites %}
+          <tr>
+            <td><span class="invite-code">{{ inv.code }}</span></td>
+            <td>{% if inv.used %}Yes{% else %}No{% endif %}</td>
+            <td>{{ inv.used_by.username|default:"—" }}</td>
+            <td>{{ inv.created_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">No invite codes generated yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Logs Tab -->
+  <div id="logsTab" class="tab-pane">
+    <div class="card">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        Recent Activity Logs
+      </h3>
+      <table>
+        <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+            <td>{{ log.user.username|default:"System" }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.details|truncatechars:80 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">No logs yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panes = document.querySelectorAll('.tab-pane');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-tab');
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      panes.forEach(pane => pane.classList.remove('active'));
+      document.getElementById(`${tabId}Tab`).classList.add('active');
+    });
+  });
+
+  // Logo canvas
+  const canvas = document.getElementById("logoCanvas");
+  const ctx = canvas.getContext("2d");
+</script>
+</body>
+</html>

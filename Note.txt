@@ -1,0 +1,6 @@
+u might think of hosting on ur machine instead of online, coz visibility of this work is very limited.and backup of it somewhere more safe
+
+initial i hosted pythonanywhere:
+username lukukuta
+password lukukuta
+email ulikaye4real2@gmail.com

@@ -1,0 +1,16 @@
+<li>
+  <div class="member-card" onclick="alert('Profile for {{ node.name }} (coming soon)')">
+    <div class="member-name">{{ node.name }}</div>
+    <div class="member-dates">
+      {% if node.birth_date %}{{ node.birth_date|date:"Y" }}{% endif %}
+      {% if node.death_date %} – {{ node.death_date|date:"Y" }}{% endif %}
+    </div>
+  </div>
+  {% if node.children %}
+    <ul>
+      {% for child in node.children %}
+        {% include 'heritage/tree_node.html' with node=child %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</li>

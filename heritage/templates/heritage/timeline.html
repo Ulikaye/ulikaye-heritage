@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Family Timeline | Ulikaye Heritage</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #0b0f19;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      padding-bottom: 60px;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 500;
+      background: rgba(10,15,25,0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo-container { display: flex; align-items: center; gap:10px; }
+    .logo-text { font-weight: bold; letter-spacing:1px; }
+    .nav-links { display: flex; gap:20px; align-items: center; }
+    .nav-links a { text-decoration: none; color:#ddd; padding:8px 14px; border-radius:10px; transition:0.3s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color:#fff; }
+    .nav-links button { background: none; border: none; color: #ddd; padding: 8px 14px; cursor: pointer; font-size: 1rem; transition:0.3s; }
+    .nav-links button:hover { background: rgba(255,255,255,0.1); color:#fff; border-radius:10px; }
+    .container { max-width: 1000px; margin: 100px auto 40px; padding: 0 24px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .sub { color: #aaa; margin-bottom: 28px; }
+    .admin-panel {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 32px;
+      display: none;
+    }
+    .admin-panel.show { display: block; }
+    .form-row { display: flex; flex-wrap: wrap; gap:16px; margin-bottom:16px; }
+    .form-group { flex:1; min-width:180px; }
+    label { display: block; margin-bottom:6px; color:#ccc; font-size:0.8rem; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #1e2a3a;
+      border: none;
+      border-radius: 16px;
+      color: white;
+    }
+    button {
+      background: #1f6feb;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-secondary { background: #3a4a5a; }
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #1f6feb, #3a4a5a);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 32px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 20px;
+      margin-left: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -30px;
+      top: 24px;
+      width: 14px;
+      height: 14px;
+      border-radius: 14px;
+      background: #1f6feb;
+      border: 2px solid #fff;
+    }
+    .event-year { font-size: 1.2rem; font-weight: bold; color: #1f6feb; margin-bottom: 8px; }
+    .event-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; }
+    .event-type { display: inline-block; background: #1f6feb30; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-bottom: 12px; }
+    .event-description { color: #ccc; line-height: 1.5; margin-bottom: 12px; }
+    .event-meta { font-size: 0.75rem; color: #888; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .delete-event { background: #d33; padding: 4px 12px; font-size: 0.7rem; margin-top: 12px; border: none; color: white; border-radius: 20px; cursor: pointer; }
+    .icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: middle; }
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      .timeline { padding-left: 20px; }
+      .timeline-item { margin-left: 12px; }
+      .timeline-dot { left: -22px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <img src="{% static 'heritage/images/logo.PNG' %}" alt="Logo" style="height: 96px; width: auto;">
+    <div class="logo-text">Family Timeline</div>
+  </div>
+  <div class="nav-links">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  </div>
+</header>
+
+<div class="container">
+  <h1>
+    <svg class="icon" viewBox="0 0 24 24" width="28" height="28"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+    Family Timeline
+  </h1>
+  <div class="sub">Key events across generations – births, marriages, migrations, and more</div>
+
+  {% if is_admin %}
+  <div id="adminPanel" class="admin-panel">
+    <h3 style="display: flex; align-items: center; gap: 8px;">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Add New Event
+    </h3>
+    <form method="post" action="{% url 'add_timeline_event' %}">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+        <div class="form-group"><label>Year (YYYY)</label><input type="number" name="year" required></div>
+        <div class="form-group"><label>Event Type</label>
+          <select name="event_type">
+            <option>Birth</option><option>Marriage</option><option>Graduation</option>
+            <option>Migration</option><option>Death</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Description</label><textarea name="description" rows="2"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Location</label><input type="text" name="location"></div>
+        <div class="form-group"><label>Related Member (optional)</label>
+          <select name="related_member">
+            <option value="">-- None --</option>
+            {% for member in members %}
+              <option value="{{ member.id }}">{{ member.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <button type="submit">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Add Event
+      </button>
+      <button type="button" id="toggleAdminBtn" class="btn-secondary">Hide Panel</button>
+    </form>
+  </div>
+  <button id="showAdminBtn" class="btn-secondary" style="margin-bottom:20px;">Show Add Form</button>
+  {% endif %}
+
+  <div class="timeline">
+    {% for event in events %}
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="event-year">{{ event.year }}</div>
+      <div class="event-title">{{ event.title }}</div>
+      <div class="event-type">{{ event.event_type }}</div>
+      <div class="event-description">{{ event.description|linebreaksbr }}</div>
+      <div class="event-meta">
+        {% if event.location %}
+          <span style="display: inline-flex; align-items: center; gap: 4px;">
+            <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            {{ event.location }}
+          </span>
+        {% endif %}
+        {% if event.related_member %}
+          <span style="display: inline-flex; align-items: center; gap: 4px;">
+            <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            {{ event.related_member.full_name }}
+          </span>
+        {% endif %}
+      </div>
+      {% if is_admin %}
+      <form method="post" action="{% url 'delete_timeline_event' event.id %}" onsubmit="return confirm('Delete this event?');">
+        {% csrf_token %}
+        <button type="submit" class="delete-event">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div style="text-align:center; padding:40px;">No events yet. Admins can add family milestones.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  const adminPanel = document.getElementById('adminPanel');
+  const showBtn = document.getElementById('showAdminBtn');
+  const toggleBtn = document.getElementById('toggleAdminBtn');
+  if(showBtn) showBtn.addEventListener('click', () => { adminPanel.classList.add('show'); showBtn.style.display='none'; });
+  if(toggleBtn) toggleBtn.addEventListener('click', () => { adminPanel.classList.remove('show'); if(showBtn) showBtn.style.display='inline-block'; });
+</script>
+</body>
+</html>

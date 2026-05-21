@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Family Tree | Ulikaye Heritage</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b0f19;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 500;
+      background: rgba(10, 15, 25, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo-container { display: flex; align-items: center; gap: 10px; }
+    .logo-text { font-weight: bold; letter-spacing: 1px; }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { text-decoration: none; color: #ddd; padding: 8px 14px; border-radius: 10px; transition: 0.3s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .container {
+      max-width: 1200px;
+      margin: 100px auto 40px;
+      padding: 0 24px;
+    }
+    h1 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .sub { color: #aaa; margin-bottom: 20px; }
+    .tree-controls {
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    select, button {
+      background: #1e2a3a;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 40px;
+      color: white;
+      cursor: pointer;
+    }
+    button {
+      background: #1f6feb;
+    }
+    button:hover { background: #0f5bd6; }
+    .tree {
+      background: rgba(0,0,0,0.3);
+      border-radius: 24px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .tree ul {
+      padding-left: 30px;
+      list-style: none;
+      position: relative;
+    }
+    .tree li {
+      position: relative;
+      padding-top: 20px;
+      margin-left: 20px;
+    }
+    .tree li::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -15px;
+      border-left: 2px solid #1f6feb;
+      height: 100%;
+    }
+    .tree li:last-child::before {
+      height: 20px;
+    }
+    .tree li::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: -15px;
+      border-top: 2px solid #1f6feb;
+      width: 20px;
+    }
+    .member-card {
+      display: inline-block;
+      background: rgba(31,111,235,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 32px;
+      padding: 10px 20px;
+      margin: 8px 0;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .member-card:hover {
+      background: #1f6feb;
+      transform: scale(1.02);
+    }
+    .member-name {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .member-dates {
+      font-size: 0.7rem;
+      color: #ccc;
+    }
+    .icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: middle; }
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      .tree ul { padding-left: 20px; }
+      .tree li { margin-left: 12px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <img src="{% static 'heritage/images/logo.PNG' %}" alt="Logo" style="height: 96px; width: auto;"><div class="logo-text">Family Tree</div></div>
+  <div class="nav-links">
+    <a href="{% url 'home' %}">Dashboard</a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: none; border: none; color: #ddd; padding: 8px 14px; cursor: pointer;">Logout</button>
+</form>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </div>
+</header>
+
+<div class="container">
+  <h1>
+    <svg class="icon" viewBox="0 0 24 24" width="28" height="28">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      <path d="M12 22V12"/>
+    </svg>
+    Family Tree
+  </h1>
+  <div class="sub">Select a root member to view descendants.</div>
+
+  <div class="tree-controls">
+    <label for="rootSelect">Root Member:</label>
+    <select id="rootSelect">
+      <option value="">-- Choose Root --</option>
+      {% for id, name in member_choices %}
+        <option value="{{ id }}" {% if selected_root|stringformat:"s" == id|stringformat:"s" %}selected{% endif %}>{{ name }}</option>
+      {% endfor %}
+    </select>
+    <button id="changeRootBtn">Show Tree</button>
+  </div>
+
+  <div class="tree">
+    {% if tree %}
+      {% include 'heritage/tree_node.html' with node=tree %}
+    {% else %}
+      <p class="sub">No family tree data yet. Add members with parent relationships in the admin panel.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  // Root selection handling
+  const rootSelect = document.getElementById('rootSelect');
+  const changeBtn = document.getElementById('changeRootBtn');
+  changeBtn.addEventListener('click', function() {
+    const rootId = rootSelect.value;
+    if (rootId) {
+      window.location.href = "{% url 'family_tree' %}?root=" + rootId;
+    } else {
+      window.location.href = "{% url 'family_tree' %}";
+    }
+  });
+
+  // Logo canvas
+  const canvas = document.getElementById("logoCanvas");
+  const ctx = canvas.getContext("2d");
+</script>
+</body>
+</html>
