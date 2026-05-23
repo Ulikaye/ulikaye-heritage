@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('create-admin/', views.create_admin, name='create_admin'),
     
+    
     # Admin panel
     path('admin/', admin.site.urls),
     path('admin-panel/', views.admin_panel, name='admin_panel'),
