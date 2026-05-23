@@ -536,8 +536,8 @@ def global_search(request):
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
-def create_admin(request):
+'''def create_admin(request):
     # Delete if exists to ensure clean creation
     User.objects.filter(username='ulikaye').delete()
     user = User.objects.create_superuser('ulikaye', 'ulikaye635@gmail.com', 'lukukuta')
-    return HttpResponse("Admin created. Username: ulikaye, Password: lukukuta")
+    return HttpResponse("Admin created. Username: ulikaye, Password: lukukuta")'''

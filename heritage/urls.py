@@ -10,7 +10,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name='heritage/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('register/', views.register, name='register'),
-    path('create-admin/', views.create_admin, name='create_admin'),
+   ''' path('create-admin/', views.create_admin, name='create_admin'),'''
     
     
     # Admin panel
