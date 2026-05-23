@@ -3,6 +3,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from django.contrib import admin
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,6 +13,7 @@ urlpatterns = [
     path('create-admin/', views.create_admin, name='create_admin'),
     
     # Admin panel
+    path('admin/', admin.site.urls),
     path('admin-panel/', views.admin_panel, name='admin_panel'),
     path('admin-panel/add-member/', views.add_member, name='add_member'),
     path('admin-panel/edit/<int:member_id>/', views.edit_member, name='edit_member'),
