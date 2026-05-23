@@ -537,3 +537,11 @@ def global_search(request):
 @login_required
 def family_map(request):
     return render(request, 'heritage/map.html')
+
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+def create_admin(request):
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('ulikaye', 'ulikaye635@gmail.com', 'lukukuta')
+        return HttpResponse("Admin created: username=ulikaye, password=lukukuta")
+    return HttpResponse("Admin already exists")
