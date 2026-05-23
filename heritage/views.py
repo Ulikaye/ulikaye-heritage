@@ -541,7 +541,6 @@ def family_map(request):
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 def create_admin(request):
-    if not User.objects.filter(username='admin').exists():
-        User.objects.create_superuser('ulikaye', 'ulikaye635@gmail.com', 'lukukuta')
-        return HttpResponse("Admin created: username=ulikaye, password=lukukuta")
-    return HttpResponse("Admin already exists")
+    User.objects.filter(username='ulikaye').delete()
+    User.objects.create_superuser('ulikaye', 'ulikaye635@gmail.com', 'lukukuta')
+    return HttpResponse("Admin recreated: username=ulikaye, password=lukukuta")
